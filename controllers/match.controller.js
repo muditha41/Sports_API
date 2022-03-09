@@ -154,12 +154,43 @@ function deleteMatch(req,res){
     });
 }
 
+function getLiveMatchById(req,res){
+    const id= req.params.id;
+
+    models.Match.findByPk(id).then(result =>{
+        if(result){
+          models.TeamCard.findByPk(result.homeTeamCardId).then(homeTeam=>{
+            models.TeamCard.findByPk(result.visitorTeamCardId).then(visitorTeam=>{
+                res.status(200).json({
+                    "match": result,
+                    "HomeTeam": homeTeam,
+                    "VisitorTeam": visitorTeam,
+                });
+            })
+          })
+         
+
+          //  res.status(200).json(result);
+        }else{
+            res.status(404).json({
+                message:"Match not found!"
+        });
+    }
+    }).catch(error=>{
+      res.status(500).json({
+      message:"somthing went wrong!"
+    })
+    });
+
+}
+
 
 module.exports = {
     addNewMatch:addNewMatch,
     getMatches:getMatches,
     getMatchById:getMatchById,
     updateMatch:updateMatch,
-    deleteMatch:deleteMatch
+    deleteMatch:deleteMatch,
+    getLiveMatchById:getLiveMatchById
 
 }
